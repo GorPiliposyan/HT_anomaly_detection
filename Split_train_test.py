@@ -41,7 +41,7 @@ def add_trojan_rows(data_set, i, num_of_trojan_rows, trojan_min, trojan_max, ht_
         ht_column = np.random.choice(available_columns)  # Choose a random column to add the HT
     else:
         ht_column = ht_column_choice
-    print(ht_column)
+    print("HT column: ", ht_column)
     # ht_free_columns = np.setdiff1d(available_columns, ht_column)
     column_with_trojan = data_set[trojan_indexes, ht_column:ht_column+1] + trojan_power
     columns_without_trojan_1 = data_set[trojan_indexes, 0:ht_column]
@@ -92,13 +92,14 @@ def split_to_train_test(split_ratio, input_data):
 # file_path = r'./POWCONS_with_voltages_2.TXT'
 file_path = r'C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/DATA_source/ALL_DATA_MERGED.txt'
 all_data = load_data(file_path)
+all_data = all_data[:4000000]
 
 averaging_level = 5
 
-P_trojan_min = 15
+P_trojan_min = 10
 P_trojan_max = 20
 
-num_of_ht_rows = 10  # HT points per instance
+num_of_ht_rows = 125  # HT points per instance
 total_num_of_HT_rows = 25000  # total number of HT rows to be generated
 N = int(total_num_of_HT_rows/num_of_ht_rows)   # number of HT locations
 
@@ -118,17 +119,19 @@ ht_index_list = np.array([], dtype=np.int64)
 # Randomly choose N indexes and HT rows
 for i in range(N):
     index = np.random.choice(available_index_range)    # choose index
-    print(index)
+    print()
+    print("HT instance: ", i)
+    print("HT index range:  ", index, index + num_of_ht_rows)
     remove_from_available_index_range = np.arange(index - buffer_zone, index + buffer_zone + 1)
     available_index_range = np.setdiff1d(available_index_range, remove_from_available_index_range)
     all_data = add_trojan_rows(data_set=all_data, i=index, num_of_trojan_rows=num_of_ht_rows,
-                               trojan_min=P_trojan_min, trojan_max=P_trojan_max, ht_column_choice= None)
+                               trojan_min=P_trojan_min, trojan_max=P_trojan_max, ht_column_choice=0)
     # ht_index_list = np.append(ht_index_list, np.arange(index, index + buffer_zone))
     ht_index_list = np.append(ht_index_list, np.arange(index, index + num_of_ht_rows))
 
 ht_index_list = np.sort(ht_index_list)      # This list is for later use
 ####################################################################################
-print(ht_index_list)
+# print(ht_index_list)
 
 
 ####################################################################################
@@ -160,10 +163,10 @@ training_data, testing_data = split_to_train_test(spl_ratio, all_data_clean)
 
 
 # Save data sets in text files
-np.savetxt("C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/HT3_1/4/my_training_data.txt", training_data, fmt='%.2f', delimiter=", ")
-np.savetxt("C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/HT3_1/4/my_testing_data.txt", testing_data, fmt='%.2f', delimiter=", ")
-np.savetxt("C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/HT3_1/4/my_trojan_data.txt", trojan_rows, fmt='%.2f', delimiter=", ")
-with open( "C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/HT3_1/4/README.txt", "w") as text_file:
+np.savetxt("C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/HT_toDraw2Ddiagram/4/my_training_data.txt", training_data, fmt='%.2f', delimiter=", ")
+np.savetxt("C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/HT_toDraw2Ddiagram/4/my_testing_data.txt", testing_data, fmt='%.2f', delimiter=", ")
+np.savetxt("C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/HT_toDraw2Ddiagram/4/my_trojan_data.txt", trojan_rows, fmt='%.2f', delimiter=", ")
+with open( "C:/Users/Gor/Desktop/New_experiments/Important_files-3/new_DATA/Split_into_train_test/HT_toDraw2Ddiagram/4/README.txt", "w") as text_file:
     print("The following parameters have been chosen to generate a {} row long HT dataset\n".format(num_of_ht_rows*N),
           "\nAveraging level = {}\nHT points = {}\nHT P_min = {}\nHT P_max = {}".format(averaging_level, num_of_ht_rows, P_trojan_min, P_trojan_max), file=text_file)
 
