@@ -17,6 +17,7 @@ File PowConsFile;
 //File yPredFile;
 const int chipSelect = 4;
 int alarm = 3;
+int alarm2 = 9;
 
 
 
@@ -76,37 +77,6 @@ const uint16_t SupportVectors[] PROGMEM = {
     8880,    9680,   26640,    8640,    8400,    9104,    8544,   26464,    7872,    7296
     };
 
-// ///////////////////Define functions////////////////////
-
-// //Check if the point is inlier or outlier.
-//bool _is_HT_clean (float a,float b, float c){
-//  float new_point[3] = {a,b,c};
-//  // Calculate the decision function value: BIGsum
-//  float BIGsum =0;
-//  for(int row=0; row<Nsv; row++){
-//
-//    // Find the square of Euclidean distance between the new point and one of the SVs.
-//    float Euc_norm_sq = 0;
-//    for(int i=0; i<vec_size; i++){
-//      float x = Sup_Vec_matrix[row][i] - new_point[i]; // keep other operations outside the sq function
-////      float x = Sup_Vec_matrix[row][0] - new_point0; // keep other operations outside the sq function
-//      Euc_norm_sq += sq(x);
-//    }
-//    
-//    float kernel_value = exp(- gamma * Euc_norm_sq);
-//    BIGsum += alpha[row] * kernel_value;
-//    
-//  }
-//  BIGsum -= RO;
-////   Return the results
-//  if (BIGsum >=0 ){
-//    return 1;
-//  }
-//  else{
-//    return 0;
-//  }
-//
-//}
 
 
 // To run the I2C MUX.
@@ -145,6 +115,7 @@ void setup() {
 
   pinMode(chipSelect, OUTPUT);
   pinMode(alarm, OUTPUT);
+  pinMode(alarm2, OUTPUT);
   
 //  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // see if the card is present and can be initialized:
@@ -165,7 +136,7 @@ void setup() {
     PowConsFile.println("");
     PowConsFile.close();
   } else {
-    Serial.println("couldn't write to SD");
+    Serial.println("No SD");
   }
 
     
@@ -190,6 +161,11 @@ float data_matrix[5][10] = {{0,0,0,0,0,0,0,0,0,0},  //Row 0
 
 int y_pred;
 int iteration = 0;                                                                 //REMOVE
+int Stability_agent[5] = {-1,-1,-1,-1,-1};
+float Agent_output;
+int Agent_pred;
+
+
 
 void loop() {
 
@@ -306,7 +282,22 @@ void loop() {
     
   }
   
-
+  /////////////////// Stex avelacru stability agent-i array-@ //////////////////////
+  Stability_agent[0] = Stability_agent[1];
+  Stability_agent[1] = Stability_agent[2];
+  Stability_agent[2] = Stability_agent[3];
+  Stability_agent[3] = Stability_agent[4];
+  Stability_agent[4] = y_pred;
+  Agent_output = Stability_agent[0] + Stability_agent[1] + Stability_agent[2] + Stability_agent[3] + Stability_agent[4];
+  
+  // Agent prediction result
+  if (Agent_output <0 ){
+    Agent_pred = -1;  digitalWrite (alarm2, 220);
+    } else{
+    Agent_pred = 1;  digitalWrite (alarm2, 0);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -359,11 +350,12 @@ void loop() {
     PowConsFile.print(data_matrix[0][7]);    PowConsFile.print(", ");
     PowConsFile.print(data_matrix[0][8]);    PowConsFile.print(", ");
     PowConsFile.print(data_matrix[0][9]);    PowConsFile.print(", ");
-    PowConsFile.print(y_pred);    PowConsFile.print(", ");
-    PowConsFile.println(BIGsum, 6);
+    PowConsFile.print(y_pred);               PowConsFile.print(", ");
+    PowConsFile.print(BIGsum, 6);            PowConsFile.print(", ");
+    PowConsFile.println(Agent_pred); 
     PowConsFile.close();
   } else {
-    Serial.println("couldn't write to SD");
+    Serial.println("No SD");
   }
 
 
