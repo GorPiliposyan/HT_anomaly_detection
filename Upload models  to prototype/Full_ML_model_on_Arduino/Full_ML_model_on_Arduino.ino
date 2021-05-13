@@ -12,7 +12,7 @@ Adafruit_INA219 ina219_C2(0x44);
 
 
 File PowConsFile;
-File debugFile;
+//File debugFile;
 //File TimingFile;
 //File yPredFile;
 const int chipSelect = 4;
@@ -23,37 +23,57 @@ int alarm = 3;
 
 // ///////////////Store ML related parameters////////////////
 
-int Nsv = 18;
-int vec_size = 5; // Write this manually to avoid unnecessarily complicated code
+int Nsv = 35;
+int vec_size = 10; // Write this manually to avoid unnecessarily complicated code
 float gamma = 0.0041;
 
 // The intercept
-float RO = -3.04603;
+float RO = -0.93821;
 
 // The support vector coefficients multiplied by 10,000. Note, all elements of the array should be max 65535, otherwise uint_16_t will overflow
-const uint16_t alpha[] PROGMEM =  {2259, 9351, 1793, 2093,10000,10000, 4789, 3879,10000,  291, 5866,10000, 3624,10000, 3060, 9402,  413, 3180};
+const uint16_t alpha[] PROGMEM =  {
+    2205,  632,  953, 2238,  164, 3123,  511, 2919, 1793, 1523,  375,   92,  417,  629, 1001, 1287, 2006, 1749,
+    1801,  334, 4182, 4272, 1011, 1946,  611, 1442, 3152,   63, 1177, 1588, 1386, 1912,  477,  439,  590
+    };
 
 
 // The support vectors. Note, all elements of the array should be max 65535, otherwise uint_16_t will overflow
 const uint16_t SupportVectors[] PROGMEM = {
-    8160,    7760,   24240,    6960,    8400,
-    8240,    9040,   24000,    8160,    8000,
-    8240,    9200,   24880,    6800,    6560,
-    8000,    7440,   24000,    8160,    7840,
-    8480,    7440,   24800,    7840,    6320,
-    8400,    7440,   24240,    8160,    8400,
-    8240,    7600,   24240,    8000,    6400,
-    8640,    7600,   24880,    7840,    8400,
-    8400,    9200,   24080,    6800,    6560,
-    8640,    7440,   24080,    8000,    8160,
-    8240,    9040,   24800,    8160,    8160,
-    7760,    8160,   25040,    6800,    8160,
-    7840,    9040,   24640,    8240,    7840,
-    8640,    7440,   24080,    6720,    6560,
-    7760,    7600,   24880,    6960,    8160,
-    8480,    9200,   24880,    6800,    6560,
-    8640,    7600,   24240,    6720,    6320,
-    8400,    7600,   25040,    6720,    6560
+    9040,    9840,   26320,    7440,    7200,    9168,    9152,   26480,    7392,    7136,
+    9040,    8240,   26640,    7200,    7040,    9104,    8272,   26368,    7696,    7168,
+    9200,    8480,   26320,    7440,    6960,   10234,    8384,   26512,    7888,    8240,
+    9200,    8800,   26080,    7200,    7360,    8832,    9584,   26384,    8176,    8112,
+    9040,    8160,   26640,    8400,    7040,    8784,    8816,   26384,    8512,    8144,
+    8640,    8480,   26080,    7440,    8800,    8672,    8400,   26352,    7632,    8704,
+    8640,    8240,   26880,    7440,    8800,    8832,    8512,   26448,    8064,    8480,
+    9040,    8480,   26480,    7840,    7040,   10528,    8624,   26400,    7648,    7184,
+    9280,    8240,   26720,    8480,    8880,    9168,    8416,   26496,    7648,    7408,
+    8880,    8000,   25920,    8480,    7200,    9120,    8240,   26288,    7664,    7168,
+    9040,    8000,   26320,    8240,    9200,    9200,    8160,   26224,    8192,    7632,
+    8800,    7840,   26640,    8640,    8480,    8736,    8592,   26480,    8368,    8512,
+    8880,    8240,   26640,    7360,    8800,    8864,    8400,   26576,    7552,    7840,
+    8880,    8160,   26080,    8400,    6960,    9024,    8192,   26128,    8432,    8352,
+    9040,    7840,   26640,    8160,    6800,    8976,    8320,   26544,    7984,    7488,
+    8880,    7840,   26480,    7360,    7040,    8944,    8432,   26400,    8080,    8224,
+    9280,    8240,   25920,    8400,    6800,    9008,    8464,   26272,    8480,    8192,
+    9200,    8000,   25920,    8240,    6960,   10211,    8240,   26368,    8112,    7488,
+    8800,    7840,   25920,    8800,    8800,    8944,    8224,   26240,    8144,    8064,
+    9280,    8160,   26640,    7360,    7040,    9248,    8256,   26512,    7664,    7088,
+    8640,    9840,   26320,    8640,    8400,   10308,    8640,   26272,    8016,    7872,
+    8640,    9680,   25840,    8640,    8400,    8752,    9488,   26240,    8480,    8416,
+    9040,    9440,   26640,    7440,    7200,    9040,    9360,   26560,    7408,    7136,
+    8640,    9840,   26640,    8800,    8240,    8768,    8816,   26608,    8288,    8368,
+    9200,    9840,   26640,    7440,    7040,    9008,    8720,   26464,    7600,    8000,
+    9200,    9680,   26640,    7360,    7040,    8896,    8592,   26416,    8160,    8096,
+    8880,    8480,   26640,    7600,    8800,   10416,    8320,   26480,    7952,    8112,
+    9200,    8240,   26640,    7440,    6800,    9136,    8288,   26368,    8096,    7136,
+    9040,    8240,   26080,    8640,    8480,   10428,    8320,   26496,    7920,    8064,
+    8880,    8160,   26640,    8480,    9040,    8800,    8528,   26304,    8576,    8608,
+    9280,    8240,   25920,    8400,    9200,    8880,    8560,   26240,    8320,    8592,
+    9200,    9680,   25920,    7200,    7200,    9008,    8848,   26304,    7648,    7136,
+    9040,    8400,   26640,    8400,    8480,    8928,    9520,   26464,    8496,    8336,
+    9200,    8480,   26480,    7440,    6800,    9104,    8384,   26576,    7456,    7040,
+    8880,    9680,   26640,    8640,    8400,    9104,    8544,   26464,    7872,    7296
     };
 
 // ///////////////////Define functions////////////////////
@@ -138,9 +158,10 @@ void setup() {
       delay(500);
     }
   }
+//  SD.begin(chipSelect);
   PowConsFile = SD.open("PowCons.txt", FILE_WRITE);
   if (PowConsFile) {
-    PowConsFile.println("Starting a new session:");
+    PowConsFile.println("New session:");
     PowConsFile.println("");
     PowConsFile.close();
   } else {
@@ -152,12 +173,12 @@ void setup() {
   digitalWrite (alarm, 0);
 }
 
-//float data_matrix[5][10] = {{0,0,0,0,0,0,0,0,0,0},  //Row 0
-//                            {0,0,0,0,0,0,0,0,0,0},  //Row 1
-//                            {0,0,0,0,0,0,0,0,0,0},  //Row 2
-//                            {0,0,0,0,0,0,0,0,0,0},  //Row 3
-//                            {0,0,0,0,0,0,0,0,0,0}}; //Row 4
-float data_matrix[1][5];
+float data_matrix[5][10] = {{0,0,0,0,0,0,0,0,0,0},  //Row 0
+                            {0,0,0,0,0,0,0,0,0,0},  //Row 1
+                            {0,0,0,0,0,0,0,0,0,0},  //Row 2
+                            {0,0,0,0,0,0,0,0,0,0},  //Row 3
+                            {0,0,0,0,0,0,0,0,0,0}}; //Row 4
+//float data_matrix[1][5];
 
 
 //float A1_power_mW;
@@ -168,48 +189,42 @@ float data_matrix[1][5];
 //float C2_power_mW;
 
 int y_pred;
-float iteration = 0;                                                                 //REMOVE
+int iteration = 0;                                                                 //REMOVE
 
 void loop() {
 
-// /////////////Shift data values down//////////////
-//  for(int column = 0; column < vec_size; column++){
-//    for(int row=3; row>=0; row--){
-//      data_matrix[row+1][column] = data_matrix[row][column];
-//    }
-//  }
+ /////////////Shift data values down//////////////
+  for(int column = 0; column < vec_size; column++){
+    for(int row=3; row>=0; row--){
+      data_matrix[row+1][column] = data_matrix[row][column];
+    }
+  }
   
 
 // ///////////////Get new datapoint////////////////
 
   tcaselect(1);
-
 //  A1_power_mW = ina219_A1.getPower_mW();
-//  B1_power_mW = ina219_B1.getPower_mW();
-  data_matrix[0][0] = ina219_B1.getPower_mW();
-//  C1_power_mW = ina219_C1.getPower_mW();
-  data_matrix[0][1] = ina219_C1.getPower_mW();
+  data_matrix[0][0] = ina219_B1.getPower_mW(); //  B1_power_mW = ina219_B1.getPower_mW();
+  data_matrix[0][1] = ina219_C1.getPower_mW(); //  C1_power_mW = ina219_C1.getPower_mW();
 
   tcaselect(2);
-//  A2_power_mW = ina219_A2.getPower_mW();
-  data_matrix[0][2] = ina219_A2.getPower_mW();
-//  B2_power_mW = ina219_B2.getPower_mW();
-  data_matrix[0][3] = ina219_B2.getPower_mW();
-//  C2_power_mW = ina219_C2.getPower_mW();
-  data_matrix[0][4] = ina219_C2.getPower_mW();
+  data_matrix[0][2] = ina219_A2.getPower_mW(); //  A2_power_mW = ina219_A2.getPower_mW();
+  data_matrix[0][3] = ina219_B2.getPower_mW(); //  B2_power_mW = ina219_B2.getPower_mW();
+  data_matrix[0][4] = ina219_C2.getPower_mW(); //  C2_power_mW = ina219_C2.getPower_mW();
 
 
 // /////////////Calculate moving averages//////////////
 
-//  for(int k=5; k<vec_size; k++){
-//    data_matrix[0][k] = (data_matrix[0][k-5]+data_matrix[1][k-5]+data_matrix[2][k-5]+data_matrix[3][k-5]+data_matrix[4][k-5])/5.0;
-//  }
+  for(int k=5; k<vec_size; k++){
+    data_matrix[0][k] = (data_matrix[0][k-5]+data_matrix[1][k-5]+data_matrix[2][k-5]+data_matrix[3][k-5]+data_matrix[4][k-5])/5.0;
+  }
 
 
 // ///////////////Process new datapoint////////////////
 
-//  float new_point[10] = {data_matrix[0][0], data_matrix[0][1], data_matrix[0][2], data_matrix[0][3], data_matrix[0][4], data_matrix[0][5], data_matrix[0][6], data_matrix[0][7], data_matrix[0][8], data_matrix[0][9]};
-  float new_point[5] = {data_matrix[0][0], data_matrix[0][1], data_matrix[0][2], data_matrix[0][3], data_matrix[0][4]};
+  float new_point[10] = {data_matrix[0][0], data_matrix[0][1], data_matrix[0][2], data_matrix[0][3], data_matrix[0][4], data_matrix[0][5], data_matrix[0][6], data_matrix[0][7], data_matrix[0][8], data_matrix[0][9]};
+//  float new_point[5] = {data_matrix[0][0], data_matrix[0][1], data_matrix[0][2], data_matrix[0][3], data_matrix[0][4]};
 
 
   // Calculate the decision function value: BIGsum
@@ -217,13 +232,23 @@ void loop() {
   unsigned int displayInt;
   int counter = 0;
   float x;
+
+  iteration++;                                          //REMOVE
+//  debugFile = SD.open("debug.txt", FILE_WRITE);         //REMOVE
+//  if (debugFile) {                                      //REMOVE
+//    debugFile.println("==============");                //REMOVE
+////    debugFile.print("       Iteration: ");              //REMOVE
+//    debugFile.println(iteration);                       //REMOVE
+////    debugFile.println("                             "); //REMOVE
+//    debugFile.close();                                  //REMOVE
+//  }                                                     //REMOVE
+
   
   for(int row=0; row<Nsv; row++){ //  AAA
 
     // Find the square of Euclidean distance between the new point and one of the SVs.
     float Euc_norm_sq = 0.0;
     
-//    for(int i=0; i<vec_size; i++){// BBB
     for (int k = row*vec_size; k < (row*vec_size)+vec_size; k++) {// BBB
       displayInt = pgm_read_word_near(SupportVectors + k);
       
@@ -247,32 +272,26 @@ void loop() {
     float alf = pgm_read_word_near(alpha + row)/10000.0; // Fetch from Flash memory location: address(alpha) + row
     BIGsum += alf * kernel_value;
 
-    debugFile = SD.open("debug.txt", FILE_WRITE);         //REMOVE
-    if (debugFile) {                                      //REMOVE
-      debugFile.print(Euc_norm_sq);                       //REMOVE
-      debugFile.print(",  ");                             //REMOVE
-      debugFile.print(astichan);                          //REMOVE
-      debugFile.print(",  ");                             //REMOVE
-      debugFile.print(kernel_value, 4);                   //REMOVE
-      debugFile.print(",  ");                             //REMOVE
-      debugFile.print(alf, 4);                            //REMOVE
-      debugFile.print(",  ");                             //REMOVE
-      debugFile.print(BIGsum, 4);                         //REMOVE
-      debugFile.println(";     ");                        //REMOVE
-      debugFile.close();                                  //REMOVE
-    }                                                     //REMOVE
+
+  
+
+//    debugFile = SD.open("debug.txt", FILE_WRITE);         //REMOVE
+//    if (debugFile) {                                      //REMOVE
+//      debugFile.print(Euc_norm_sq);                       //REMOVE
+//      debugFile.print(", ");                              //REMOVE
+//      debugFile.print(astichan);                          //REMOVE
+//      debugFile.print(", ");                              //REMOVE
+//      debugFile.print(kernel_value, 4);                   //REMOVE
+//      debugFile.print(",  ");                             //REMOVE
+//      debugFile.print(alf, 4);                            //REMOVE
+//      debugFile.print(", ");                              //REMOVE
+//      debugFile.print(BIGsum, 4);                         //REMOVE
+//      debugFile.println(";");                             //REMOVE
+//      debugFile.close();                                  //REMOVE
+//    }                                                     //REMOVE
     
   }
-  iteration++;                                          //REMOVE
-  debugFile = SD.open("debug.txt", FILE_WRITE);         //REMOVE
-  if (debugFile) {                                      //REMOVE
-    debugFile.println("============================="); //REMOVE
-    debugFile.print("               ");                 //REMOVE
-    debugFile.println(iteration);                       //REMOVE
-    debugFile.println("-----------------------------"); //REMOVE
-    debugFile.close();                                  //REMOVE
-  }                                                     //REMOVE
-  
+
 
   
   BIGsum = BIGsum + RO;
@@ -328,47 +347,24 @@ void loop() {
 
   PowConsFile = SD.open("PowCons.txt", FILE_WRITE);
   if (PowConsFile) {
-    PowConsFile.print(iteration);                       //REMOVE
-    PowConsFile.print(") ");                            //REMOVE
-//    PowConsFile.print(A1_power_mW);
-//    PowConsFile.print(",  ");
-    PowConsFile.print(data_matrix[0][0]);
-    PowConsFile.print(",  ");
-    PowConsFile.print(data_matrix[0][1]);
-    PowConsFile.print(",  ");
-    PowConsFile.print(data_matrix[0][2]);
-    PowConsFile.print(",  ");
-    PowConsFile.print(data_matrix[0][3]);
-    PowConsFile.print(",  ");
-    PowConsFile.print(data_matrix[0][4]);
-    PowConsFile.print(",  ");
-//    PowConsFile.print(data_matrix[0][5]);
-//    PowConsFile.print(",  ");
-//    PowConsFile.print(data_matrix[0][6]);
-//    PowConsFile.print(",  ");
-//    PowConsFile.print(data_matrix[0][7]);
-//    PowConsFile.print(",  ");
-//    PowConsFile.print(data_matrix[0][8]);
-//    PowConsFile.print(",  ");
-//    PowConsFile.print(data_matrix[0][9]);
-//    PowConsFile.print(",  ");
-    PowConsFile.print(y_pred);
-    PowConsFile.print(",  ");
+    PowConsFile.print(iteration);            PowConsFile.print("), ");    //REMOVE
+//    PowConsFile.print(A1_power_mW);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][0]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][1]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][2]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][3]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][4]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][5]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][6]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][7]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][8]);    PowConsFile.print(", ");
+    PowConsFile.print(data_matrix[0][9]);    PowConsFile.print(", ");
+    PowConsFile.print(y_pred);    PowConsFile.print(", ");
     PowConsFile.println(BIGsum, 6);
     PowConsFile.close();
   } else {
     Serial.println("couldn't write to SD");
   }
 
-// ///////////////Store info to SD card////////////////
-//  yPredFile = SD.open("Predictions.txt", FILE_WRITE);
-//  if (yPredFile) {
-//    yPredFile.print(y_pred);
-//    yPredFile.println(", ");
-//    
-//    yPredFile.close();
-//  } else {
-//    Serial.println("couldn't write to SD");
-//  }
-  
+
 }
