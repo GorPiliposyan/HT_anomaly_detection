@@ -15,7 +15,8 @@ File PowConsFile;
 File debugFile;
 //File TimingFile;
 const int chipSelect = 4;
-int alarm = 3;
+//int alarm = 3;
+int alarm = 9;
 
 
 // To run the I2C MUX.
@@ -37,15 +38,15 @@ void setup() {
   //  //ina219.setCalibration_16V_400mA();
 
   tcaselect(1);
-//  ina219_A1.begin();  ina219_A1.setCalibration_32V_1A();
-  ina219_B1.begin();  ina219_B1.setCalibration_32V_1A();
-  ina219_C1.begin();  ina219_C1.setCalibration_32V_1A();
+//  ina219_A1.begin();  ina219_A1.setCalibration_16V_400mA();
+  ina219_B1.begin();  ina219_B1.setCalibration_16V_400mA();
+  ina219_C1.begin();  ina219_C1.setCalibration_16V_400mA();
 
 
   tcaselect(2);
-  ina219_A2.begin();  ina219_A2.setCalibration_32V_1A();
-  ina219_B2.begin();  ina219_B2.setCalibration_32V_1A();
-  ina219_C2.begin();  ina219_C2.setCalibration_32V_1A();
+  ina219_A2.begin();  ina219_A2.setCalibration_16V_400mA();
+  ina219_B2.begin();  ina219_B2.setCalibration_16V_400mA();
+  ina219_C2.begin();  ina219_C2.setCalibration_16V_400mA();
 
 
   pinMode(chipSelect, OUTPUT);
@@ -156,7 +157,7 @@ void loop() {
     PowConsFile.print(B2_power_mW);
     PowConsFile.print(",  ");
     PowConsFile.print(C2_power_mW);
-    PowConsFile.println(",");
+    PowConsFile.println("");
     PowConsFile.close();
   } else {
     Serial.println("couldn't write to SD");
